@@ -20,7 +20,38 @@ import {
     TablePagination
 } from '@mui/material';
 
+import { useRouter } from 'src/routes/hooks';
+
 export default function CensoPage() {
+        const dataMock = [
+      {
+        id: 1,
+        vigencia: "2334",
+        resguardo_ind: 23334,
+        comunidad_ind: 3443,
+        persona: {
+          id: 1,
+          nombres: "string",
+          apellidos: "string",
+          tipo_documento: "CC",
+          numero_documento: 2147483647,
+          exp_documento: "2024-08-28",
+          fecha_nacimiento: "2024-08-28",
+          parentesco: "PA",
+          sexo: "string",
+          estado_civil: "string",
+          profesion: "string",
+          escolaridad: "SC",
+          integrantes: 2147483647,
+          direccion: "string",
+          telefono: "string",
+          usuario: "string",
+          familia_id: 1
+        },
+        documento_pdf: "http://127.0.0.1:8000/media/pdfs/Certificado_paz_y_salvo__2YgBHtB.pdf"
+      }
+    ];
+    const router=useRouter();
     const [censoData, setCensoData] = useState([]);
     const [filteredCensoData, setFilteredCensoData] = useState([]);
     const [open, setOpen] = useState(false);
@@ -227,6 +258,11 @@ export default function CensoPage() {
         handleOpen();
     };
 
+    const handleRedirectpdf= (censo)=>{
+        router.push(`/pdf/${censo.id}`);
+        
+    }
+
     const handleUpdateCenso = (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
@@ -353,7 +389,7 @@ handleClose();
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredCensoData
+                        {dataMock
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((censo) => (
                                 <TableRow key={censo.id}>
@@ -392,6 +428,14 @@ handleClose();
                                             onClick={() => handleDeleteCensoAndPerson(censo.persona.id, censo.id)}
                                         >
                                             Eliminar
+                                        </Button>
+
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            onClick={() => handleRedirectpdf(censo)}
+                                        >
+                                            generar pdf
                                         </Button>
                                     </TableCell>
                                 </TableRow>

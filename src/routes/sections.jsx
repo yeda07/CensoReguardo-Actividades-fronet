@@ -10,6 +10,7 @@ export const LoginPage = lazy(() => import('src/pages/login'));
 export const CensoPage = lazy(() => import('src/pages/censo'));
 export const ActividadesPage = lazy(() => import('src/pages/actividades'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const PdfPage = lazy(() => import('src/pages/pdf'));
 
 // ----------------------------------------------------------------------
 
@@ -27,6 +28,7 @@ export default function Router() {
         { element: <IndexPage />, index: true },
         { path: 'censo', element: <CensoPage /> },
         { path: 'actividades', element: <ActividadesPage /> },
+        {path:'pdf/:id',element:<PdfPage/>}
         
         
       ],
