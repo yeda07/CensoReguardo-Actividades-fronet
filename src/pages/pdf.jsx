@@ -41,49 +41,89 @@ export default function PdfPage() {
 
     return (
         <>
-            <div id="print-section">
-                <table border="1" width="100%" style={{ width: '100%' }}>
+            <div id="print-section" style={{ position: 'relative', zIndex: 1, fontFamily: '"Times New Roman", Times, serif', fontSize: '14px' }}>
+                <style>
+                    {`
+                        @media print {
+                            body {
+                                font-family: "Times New Roman", Times, serif;
+                                font-size: 14px;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+                            td {
+                                padding: 2px;
+                                margin: 0;
+                                text-align: left;
+                            }
+                            h2 {
+                                font-size: 16px;
+                                margin: 0;
+                            }
+                            p {
+                                margin: 4px 0;
+                                font-size: 14px;
+                                text-align: center;
+                            }
+                        }
+                    `}
+                </style>
+                <img 
+                    src="/public/assets/images/avatars/fondo.png" 
+                    alt="Fondo" 
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: '80%',
+                        height: 'auto',
+                        transform: 'translate(-50%, -50%)',
+                        opacity: 0.3,
+                        zIndex: -1
+                    }} 
+                />
+                <table border="1" width="100%" style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <tr>
-                        <td><img  style={{width:"100%"}}src="/public/assets/images/avatars/8c04b94e-5f47-4099-91fb-79bc395e878b.jpg" alt="Logo" /></td>
-                        <td style={{ textAlign: 'center' }}>
+                        <td><img style={{ width: "80%", height: "auto" }} src="/public/assets/images/avatars/logoind.jpg" alt="Logo" /></td>
+                        <td style={{ textAlign: 'center', padding: '4px' }}>
                             REPÚBLICA DE COLOMBIA
                             <br />DEPARTAMENTO DEL PUTUMAYO
                             <br />
                             MUNICIPIO DE PUERTO CAICEDO <br />
                             RESGUARDO INDÍGENA AWA, SAN ANDRÉS – LAS VEGAS – VILLA UNIÓN
-                            <p>
+                            <p style={{ margin: '4px 0' }}>
                                 Constituido mediante acuerdo número 015 del 30 de junio de 2005 –
                                 Incoder Nit: 900110176-4
                             </p>
                         </td>
-                        <td><img style={{width:"100%"}} src="/public/assets/images/avatars/image1.jpg" alt="Logo" /></td>
+                        <td><img style={{ width: "80%", height: "auto" }} src="/public/assets/images/avatars/image1.jpg" alt="Logo" /></td>
                     </tr>
                 </table>
 
-                <h2 style={{ textAlign: 'center' }}>CERTIFICADO DE PAZ Y SALVO</h2>
-                <br />
-                <div style={{ textAlign: 'left' }}>
+                <h2 style={{ textAlign: 'center', margin: '10px 0' }}>CERTIFICADO DE PAZ Y SALVO</h2>
+                
+                <div style={{ textAlign: 'center', padding: '4px', marginTop: '40px' }}>
                     <p>
-                        Yo, ____________________________, Gobernador de Resguardo awa san
+                        Yo, ____________________________, Gobernador de Resguardo awa san<br />
                         andres-las vegas-villa union, por medio de la presente certifico que:
                     </p>
 
                     <p>
-                        El() Sr.(a) <b>nombre</b>, identificado(a) con
-                        <b>[Tipo y número de documento de identificación]</b>, ha cumplido con
-                        todas sus obligaciones financieras y/o contractuales con nuestra
-                        institución hasta la fecha de emisión de este certificado.
+                        El(la) Sr.(a) <b>nombre</b>, identificado(a) con <b>[Tipo y número de documento de identificación],<br />
+                        </b>ha cumplido con todas sus obligaciones<br />
+                        financieras y/o contractuales con nuestra institu-<br />ción hasta la fecha de emisión de este certificado.
                     </p>
 
                     <p>
-                        Se expide el presente certificado a petición del interesado(a), para los
-                        fines que este(a) estime conveniente.
+                        Se expide el presente certificado a petición del interesado(a), para los fines que este(a) es-<br />time conveniente.
                     </p>
 
                     <p>Fecha de emisión: <b>[Fecha de emisión del certificado]</b></p>
                     <br />
                     <br />
-                    <p>
+                    <p style={{ marginBottom: '40px', textAlign: 'left', paddingLeft: '20%' }}>
                         Firma: _________________________<br />
                         <b>[Nombre del Emisor del Certificado]</b><br />
                         Gobernador<br />
@@ -91,19 +131,25 @@ export default function PdfPage() {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px', marginTop: '80px' }}>
                     <p>
-                        _______________________________<br />
+                        <img src="/public/assets/images/avatars/firma1.png" alt="Firma Bolívar" style={{ width: '180px', height: 'auto' }} /><br />
                         BOLÍVAR CHAPUESGAL PAI<br />
                         CC: 18.102.524<br />
                         Gobernador central
                     </p>
                     <p>
-                        _______________________________<br />
+                        <img src="/public/assets/images/avatars/firma2.png" alt="Firma Henoc" style={{ width: '180px', height: 'auto' }} /><br />
                         HENOC WILFREDO GONZALEZ<br />
                         CC: 15.571.717<br />
                         Secretario General
                     </p>
+                </div>
+
+                <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '12px' }}>
+                    <p>Dirección: Resguardo San Andrés - Las Vegas - Villa Unión</p>
+                    <p>Email: resguardosandreslvegasvunion@gmail.com</p>
+                    <p>Cel. 3209035795 - 3115891932</p>
                 </div>
             </div>
             <button type="button" onClick={handlePrint}>Print</button>
