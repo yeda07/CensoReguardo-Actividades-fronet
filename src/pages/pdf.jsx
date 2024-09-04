@@ -5,6 +5,15 @@ export default function PdfPage() {
     const { id } = useParams();
     const [data, setData] = useState(null);
 
+    const [currentDate, setCurrentDate] = useState('');
+
+
+    useEffect(() => {
+        const today = new Date().toLocaleDateString(); // Puedes personalizar el formato según necesites
+        setCurrentDate(today);
+    }, []);
+    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -113,7 +122,8 @@ export default function PdfPage() {
                         Se expide el presente certificado a petición del interesado(a), para los fines que este(a) es-<br />time conveniente.
                     </p>
 
-                    <p>Fecha de emisión: <b>[Fecha de emisión del certificado]</b></p>
+                    <p>Fecha de emisión: <b>{currentDate}</b></p>
+
                     <br />
                     <br />
                     <p style={{ marginBottom: '40px', textAlign: 'left', paddingLeft: '20%' }}>
