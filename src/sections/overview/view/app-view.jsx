@@ -116,14 +116,7 @@ export default function AppView() {
             Crear Familia
           </Typography>
           <form onSubmit={handleSubmit}>
-            <TextField
-              label="ID"
-              name="id"
-              value={familyData.id}
-              onChange={handleChange}
-              margin="normal"
-              fullWidth
-            />
+            
             <TextField
               label="Número de Familia"
               name="numero_familia"
