@@ -1,34 +1,23 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
 export default function PdfPage() {
     const { id } = useParams();
-    const dataMock = {
-        id: 1,
-        vigencia: "2334",
-        resguardo_ind: 23334,
-        comunidad_ind: 3443,
-        persona: {
-            id: 1,
-            nombres: "string",
-            apellidos: "string",
-            tipo_documento: "CC",
-            numero_documento: 2147483647,
-            exp_documento: "2024-08-28",
-            fecha_nacimiento: "2024-08-28",
-            parentesco: "PA",
-            sexo: "string",
-            estado_civil: "string",
-            profesion: "string",
-            escolaridad: "SC",
-            integrantes: 2147483647,
-            direccion: "string",
-            telefono: "string",
-            usuario: "string",
-            familia_id: 1
-        },
-        documento_pdf: "http://127.0.0.1:8000/media/pdfs/Certificado_paz_y_salvo__2YgBHtB.pdf"
-    };
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`https://censo-backend.onrender.com/censo/${id}`);
+                const result = await response.json();
+                setData(result);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, [id]);
 
     const handlePrint = () => {
         const printContents = document.getElementById('print-section').innerHTML;
@@ -38,6 +27,10 @@ export default function PdfPage() {
         window.print();
         document.body.innerHTML = originalContents;
     };
+
+    if (!data) return <p>Loading...</p>;
+
+    const { persona } = data;
 
     return (
         <>
@@ -111,8 +104,8 @@ export default function PdfPage() {
                     </p>
 
                     <p>
-                        El(la) Sr.(a) <b>nombre</b>, identificado(a) con <b>[Tipo y número de documento de identificación],<br />
-                        </b>ha cumplido con todas sus obligaciones<br />
+                        El(la) Sr.(a) <b>{persona.nombres} {persona.apellidos}</b>, identificado(a) con <b>{persona.tipo_documento} {persona.numero_documento}</b><br />
+                        ha cumplido con todas sus obligaciones<br />
                         financieras y/o contractuales con nuestra institu-<br />ción hasta la fecha de emisión de este certificado.
                     </p>
 
