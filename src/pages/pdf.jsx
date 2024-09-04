@@ -88,7 +88,7 @@ export default function PdfPage() {
                 />
                 <table border="1" width="100%" style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <tr>
-                        <td><img style={{ width: "80%", height: "auto" }} src="/public/assets/images/avatars/logoind.jpg" alt="Logo" /></td>
+                        <td><img style={{ width: "80%", height: "auto" }} src="/assets/images/avatars/logoind.jpg" alt="Logo" /></td>
                         <td style={{ textAlign: 'center', padding: '4px' }}>
                             REPÚBLICA DE COLOMBIA
                             <br />DEPARTAMENTO DEL PUTUMAYO
@@ -100,7 +100,7 @@ export default function PdfPage() {
                                 Incoder Nit: 900110176-4
                             </p>
                         </td>
-                        <td><img style={{ width: "80%", height: "auto" }} src="/public/assets/images/avatars/image1.jpg" alt="Logo" /></td>
+                        <td><img style={{ width: "80%", height: "auto" }} src="/assets/images/avatars/image1.jpg" alt="Logo" /></td>
                     </tr>
                 </table>
 
@@ -136,13 +136,13 @@ export default function PdfPage() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px', marginTop: '80px' }}>
                     <p>
-                        <img src="/public/assets/images/avatars/firma1.png" alt="Firma Bolívar" style={{ width: '180px', height: 'auto' }} /><br />
+                        <img src="/assets/images/avatars/firma1.png" alt="Firma Bolívar" style={{ width: '180px', height: 'auto' }} /><br />
                         BOLÍVAR CHAPUESGAL PAI<br />
                         CC: 18.102.524<br />
                         Gobernador central
                     </p>
                     <p>
-                        <img src="/public/assets/images/avatars/firma2.png" alt="Firma Henoc" style={{ width: '180px', height: 'auto' }} /><br />
+                        <img src="/assets/images/avatars/firma2.png" alt="Firma Henoc" style={{ width: '180px', height: 'auto' }} /><br />
                         HENOC WILFREDO GONZALEZ<br />
                         CC: 15.571.717<br />
                         Secretario General
