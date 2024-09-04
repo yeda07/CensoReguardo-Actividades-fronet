@@ -23,35 +23,6 @@ import {
 import { useRouter } from 'src/routes/hooks';
 
 export default function CensoPage() {
-        const dataMock = [
-      {
-        id: 1,
-        vigencia: "2334",
-        resguardo_ind: 23334,
-        comunidad_ind: 3443,
-        persona: {
-          id: 1,
-          nombres: "string",
-          apellidos: "string",
-          tipo_documento: "CC",
-          numero_documento: 2147483647,
-          exp_documento: "2024-08-28",
-          fecha_nacimiento: "2024-08-28",
-          parentesco: "PA",
-          sexo: "string",
-          estado_civil: "string",
-          profesion: "string",
-          escolaridad: "SC",
-          integrantes: 2147483647,
-          direccion: "string",
-          telefono: "string",
-          usuario: "string",
-          familia_id: 1
-        },
-        documento_pdf: "http://127.0.0.1:8000/media/pdfs/Certificado_paz_y_salvo__2YgBHtB.pdf"
-      }
-    ];
-    const router=useRouter();
     const [censoData, setCensoData] = useState([]);
     const [filteredCensoData, setFilteredCensoData] = useState([]);
     const [open, setOpen] = useState(false);
@@ -76,8 +47,11 @@ export default function CensoPage() {
         direccion: '',
         telefono: '',
         usuario: '',
-        familia_id: ''
+        familida_id: '',
+        
     });
+
+    const router = useRouter();
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateId, setUpdateId] = useState(null);
 
@@ -122,7 +96,8 @@ export default function CensoPage() {
             direccion: '',
             telefono: '',
             usuario: '',
-            familia_id: ''
+            familida_id: '',
+            
         });
     };
 
@@ -137,6 +112,12 @@ export default function CensoPage() {
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
+    const handleRedirectpdf = (censo) => {
+        router.push(`/pdf/${censo.id}`);
+
+    }
+
+
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
@@ -152,7 +133,7 @@ export default function CensoPage() {
     };
 
     const handleAddCenso = (e) => {
-        e.preventDefault(); // Prevent default form submission behavior
+        e.preventDefault();
         const token = localStorage.getItem('token');
 
         const nuevoCenso = {
@@ -175,7 +156,8 @@ export default function CensoPage() {
                 direccion: formData.direccion,
                 telefono: formData.telefono,
                 usuario: formData.usuario,
-                familia_id: parseInt(formData.familia_id, 10)
+                familida_id: parseInt(formData.familida_id, 10),
+                // Nuevo campo agregado
             }
         };
 
@@ -251,17 +233,12 @@ export default function CensoPage() {
             direccion: censo.persona?.direccion || '',
             telefono: censo.persona?.telefono || '',
             usuario: censo.persona?.usuario || '',
-            familia_id: censo.persona?.familia_id || ''
+            familida_id: censo.persona?.familida_id || ''
         });
         setUpdateId(censo.id);
         setIsUpdating(true);
         handleOpen();
     };
-
-    const handleRedirectpdf= (censo)=>{
-        router.push(`/pdf/${censo.id}`);
-        
-    }
 
     const handleUpdateCenso = (e) => {
         e.preventDefault();
@@ -292,7 +269,8 @@ export default function CensoPage() {
             direccion: formData.direccion,
             telefono: formData.telefono,
             usuario: formData.usuario,
-            familia_id: parseInt(formData.familia_id, 10)
+            familida_id: parseInt(formData.familida_id, 10),
+           
         };
 
         fetch(censoUrl, {
@@ -305,7 +283,6 @@ export default function CensoPage() {
         })
             .then(response => response.json())
             .then(updatedCensoData => {
-                // Update the persona data
                 fetch(personaUrl, {
                     method: 'PUT',
                     headers: {
@@ -317,21 +294,20 @@ export default function CensoPage() {
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('No se pudo actualizar la persona');
-}
-// Update local data after successfully updating both records
-const updatedCensoIndex = censoData.findIndex(censo => censo.id === updateId);
-if (updatedCensoIndex !== -1) {
-    const updatedCensoArray = [...censoData];
-    updatedCensoArray[updatedCensoIndex] = updatedCensoData;
-    setCensoData(updatedCensoArray);
-    setFilteredCensoData(updatedCensoArray);
-}
-handleClose();
-})
-.catch (error => console.error('Error al actualizar la persona:', error));
-})
-.catch (error => console.error('Error al actualizar el censo:', error));
-};
+                        }
+                        const updatedCensoIndex = censoData.findIndex(censo => censo.id === updateId);
+                        if (updatedCensoIndex !== -1) {
+                            const updatedCensoArray = [...censoData];
+                            updatedCensoArray[updatedCensoIndex] = updatedCensoData;
+                            setCensoData(updatedCensoArray);
+                            setFilteredCensoData(updatedCensoArray);
+                        }
+                        handleClose();
+                    })
+                    .catch(error => console.error('Error al actualizar la persona:', error));
+            })
+            .catch(error => console.error('Error al actualizar el censo:', error));
+    };
 
     return (
     // Tu JSX aquí
@@ -384,12 +360,13 @@ handleClose();
                             <TableCell>Direccion</TableCell>
                             <TableCell>Telefono</TableCell>
                             <TableCell>Usuario</TableCell>
-                            <TableCell>Familida ID</TableCell>
+                            <TableCell>Familia ID</TableCell>
+                            <TableCell>PDF</TableCell>
                             <TableCell>Acciones</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {dataMock
+                        {filteredCensoData
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((censo) => (
                                 <TableRow key={censo.id}>
@@ -416,6 +393,17 @@ handleClose();
                                     <TableCell>
                                         <Button
                                             variant="outlined"
+                                            color="error"
+                                            onClick={() => handleRedirectpdf(censo)}
+                                        >
+                                            generar pdf
+                                        </Button>
+                                    </TableCell>
+
+
+                                    <TableCell>
+                                        <Button
+                                            variant="outlined"
                                             color="primary"
                                             onClick={() => handleOpenUpdate(censo)}
                                             sx={{ mr: 1 }}
@@ -428,14 +416,6 @@ handleClose();
                                             onClick={() => handleDeleteCensoAndPerson(censo.persona.id, censo.id)}
                                         >
                                             Eliminar
-                                        </Button>
-
-                                        <Button
-                                            variant="outlined"
-                                            color="error"
-                                            onClick={() => handleRedirectpdf(censo)}
-                                        >
-                                            generar pdf
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -488,7 +468,7 @@ handleClose();
                                     fullWidth
                                     value={formData.id || ''}  // Asegúrate de que el valor no sea undefined
                                     onChange={handleFormChange}
-                                    required
+                                    
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -603,13 +583,24 @@ handleClose();
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     required
+                                    select
                                     fullWidth
                                     label="Parentesco"
                                     variant="outlined"
                                     name="parentesco"
                                     value={formData.parentesco}
                                     onChange={handleFormChange}
-                                />
+                                
+                                 >
+                                <MenuItem value="PA">PADRE</MenuItem>
+                                <MenuItem value="MA"> MADRE</MenuItem>
+                                <MenuItem value="HI"> HIJO-HIJA</MenuItem>
+                                <MenuItem value="YE"> YERNO</MenuItem>
+                                <MenuItem value="TI"> TIO</MenuItem>
+                                <MenuItem value="HE"> HERMANO-HERMANA</MenuItem>
+                                <MenuItem value="AB"> ABUELO O ABUELA</MenuItem>
+
+                            </TextField>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -658,14 +649,24 @@ handleClose();
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     required
+                                    select
                                     fullWidth
                                     label="Escolaridad"
                                     variant="outlined"
                                     name="escolaridad"
                                     value={formData.escolaridad}
                                     onChange={handleFormChange}
-                                />
+                                  >
+                                <MenuItem value="SC">SECUNDARIA</MenuItem>
+                                <MenuItem value="PR"> PRIMARIA</MenuItem>
+                                <MenuItem value="UN"> UNIVERSIDAD</MenuItem>
+                                <MenuItem value="NI"> NINGUNA</MenuItem>
+                                
+                               </TextField>
                             </Grid>
+                           
+
+
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     required
@@ -718,12 +719,13 @@ handleClose();
                                     required
                                     fullWidth
                                     onChange={handleFormChange}
-                                    name="familia_id"
+                                    name="familida_id"
                                     label="ID Familia"
                                     type="text"  // Cambia type de number a text temporalmente
-                                    value={formData.familia_id}
+                                    value={formData.familida_id || ''}
                                 />
                             </Grid>
+                          
 
                         </Grid>
 

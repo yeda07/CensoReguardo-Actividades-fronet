@@ -9,12 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
-import { account } from 'src/_mock/account';
-
-// ----------------------------------------------------------------------
-
-
-// ----------------------------------------------------------------------
+import { account } from 'src/_mock/account'; // Asegúrate de importar tu objeto de cuenta desde el mock
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
@@ -25,6 +20,13 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+  const handleLogout = () => {
+    // Aquí deberías realizar la lógica de cierre de sesión
+    // Por ejemplo, limpiar el estado, eliminar el token JWT, etc.
+    console.log('Cerrando sesión...');
+    handleClose(); // Cerrar el popover después de hacer logout
   };
 
   return (
@@ -80,14 +82,14 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-       
+        {/* Aquí puedes agregar más elementos de menú si es necesario */}
 
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={handleLogout} // Llama a la función de logout al hacer clic
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout
