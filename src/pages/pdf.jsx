@@ -73,7 +73,7 @@ export default function PdfPage() {
                     `}
                 </style>
                 <img 
-                    src="/public/assets/images/avatars/fondo.png" 
+                    src="/assets/images/avatars/fondo.png" 
                     alt="Fondo" 
                     style={{
                         position: 'absolute',
