@@ -4,15 +4,12 @@ import React, { useState, useEffect } from 'react';
 export default function PdfPage() {
     const { id } = useParams();
     const [data, setData] = useState(null);
-
     const [currentDate, setCurrentDate] = useState('');
-
 
     useEffect(() => {
         const today = new Date().toLocaleDateString(); // Puedes personalizar el formato según necesites
         setCurrentDate(today);
     }, []);
-    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -72,9 +69,9 @@ export default function PdfPage() {
                         }
                     `}
                 </style>
-                <img 
-                    src="/assets/images/avatars/fondo.png" 
-                    alt="Fondo" 
+                <img
+                    src="/assets/images/avatars/fondo.png"
+                    alt="Fondo"
                     style={{
                         position: 'absolute',
                         top: '50%',
@@ -84,7 +81,7 @@ export default function PdfPage() {
                         transform: 'translate(-50%, -50%)',
                         opacity: 0.3,
                         zIndex: -1
-                    }} 
+                    }}
                 />
                 <table border="1" width="100%" style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <tr>
@@ -105,34 +102,48 @@ export default function PdfPage() {
                 </table>
 
                 <h2 style={{ textAlign: 'center', margin: '10px 0' }}>CERTIFICADO DE PAZ Y SALVO</h2>
-                
-                <div style={{ textAlign: 'center', padding: '4px', marginTop: '40px' }}>
+
+                <div style={{ width: '80%', margin: '0 auto', textAlign: 'justify', padding: '4px', marginTop: '40px', textAlignLast: 'center' }}>
+                    {/* 
+        Este párrafo introduce al emisor del certificado. 
+        Se utiliza <b> para resaltar el nombre del gobernador, 
+        otorgando formalidad y validez al documento. 
+    */}
                     <p>
-                        Yo, ____________________________, Gobernador de Resguardo awa san<br />
+                        Yo, <b>Bolivar Chapuesgal Pai</b>, Gobernador de Resguardo awa san<br />
                         andres-las vegas-villa union, por medio de la presente certifico que:
                     </p>
 
+                    {/* 
+        Este párrafo proporciona los datos del beneficiario del certificado. 
+        Los datos importantes como nombres, apellidos, tipo y número de documento 
+        se resaltan con <b> para garantizar que sean fácilmente identificables. 
+    */}
                     <p>
                         El(la) Sr.(a) <b>{persona.nombres} {persona.apellidos}</b>, identificado(a) con <b>{persona.tipo_documento} {persona.numero_documento}</b><br />
                         ha cumplido con todas sus obligaciones<br />
                         financieras y/o contractuales con nuestra institu-<br />ción hasta la fecha de emisión de este certificado.
                     </p>
 
+                    {/* 
+        Este párrafo aclara que el certificado se expide bajo solicitud del interesado,
+        lo que es típico en documentos oficiales para justificar su emisión. 
+    */}
                     <p>
-                        Se expide el presente certificado a petición del interesado(a), para los fines que este(a) es-<br />time conveniente.
+                        Se expide el presente certificado a petición del interesado(a), para los fines que este(a) estime conveniente.
                     </p>
 
-                    <p>Fecha de emisión: <b>{currentDate}</b></p>
+                    {/* 
+        Este párrafo muestra la fecha en que se emite el certificado. 
+        La fecha se resalta con <b> para que sea claramente visible. 
+    */}
+                    <p style={{ textAlign: 'center' }}>Fecha de emisión: <b>{currentDate}</b></p>
 
+                    {/* Espaciado adicional para mejorar la presentación visual */}
                     <br />
                     <br />
-                    <p style={{ marginBottom: '40px', textAlign: 'left', paddingLeft: '20%' }}>
-                        Firma: _________________________<br />
-                        <b>[Nombre del Emisor del Certificado]</b><br />
-                        Gobernador<br />
-                        Resguardo awa san andres-las vegas-villa union
-                    </p>
                 </div>
+
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px', marginTop: '80px' }}>
                     <p>
