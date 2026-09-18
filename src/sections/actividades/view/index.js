@@ -1,1 +1,1 @@
-export { default as ActividadesView } from './actividades-view';
+export { default as ActividadesView } from './actividades-workspace';

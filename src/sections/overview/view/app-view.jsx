@@ -11,6 +11,8 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 
+import { apiFetch, API_BASE_URL } from 'src/config/api';
+
 import Iconify from 'src/components/iconify';
 
 import AppTrafficBySite from '../app-traffic-by-site';
@@ -33,7 +35,7 @@ export default function AppView() {
 
   const fetchFamilies = async () => {
     try {
-      const response = await fetch('https://censo-backend.onrender.com/familia/');
+      const response = await apiFetch(`${API_BASE_URL}/familia/`);
       const text = await response.text();
       console.log('Response text:', text);
       const data = JSON.parse(text);
@@ -45,7 +47,7 @@ export default function AppView() {
 
   const fetchPersons = async (familyId) => {
     try {
-      const response = await fetch(`https://censo-backend.onrender.com/persona/?familia_id=${familyId}`);
+      const response = await apiFetch(`${API_BASE_URL}/persona/?familia_id=${familyId}`);
       const text = await response.text();
       console.log('Persons response text:', text);
       const data = JSON.parse(text);
@@ -66,7 +68,7 @@ export default function AppView() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('https://censo-backend.onrender.com/familia/', {
+      const response = await apiFetch(`${API_BASE_URL}/familia/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

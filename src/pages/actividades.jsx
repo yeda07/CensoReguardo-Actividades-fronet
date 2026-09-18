@@ -8,7 +8,7 @@ export default function ActividadesPage() {
   return (
     <>
       <Helmet>
-        <title> Actividades</title>
+        <title>Actividades | Censo del resguardo</title>
       </Helmet>
 
       <ActividadesView />

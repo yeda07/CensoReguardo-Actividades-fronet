@@ -3,6 +3,8 @@ import { Bar, XAxis, YAxis, Legend, Tooltip, BarChart, CartesianGrid } from 'rec
 
 import { List, Card, Button, TextField, Typography, CardContent } from '@mui/material';
 
+import { apiFetch, API_BASE_URL } from 'src/config/api';
+
 const ActividadComponente = () => {
     const [actividades, setActividades] = useState([]);
     const [actividadEditada, setActividadEditada] = useState('');
@@ -15,7 +17,7 @@ const ActividadComponente = () => {
 
     const obtenerActividades = async () => {
         try {
-            const response = await fetch('https://censo-backend.onrender.com/actividad/');
+            const response = await apiFetch(`${API_BASE_URL}/actividad/`);
             if (!response.ok) {
                 throw new Error('Error al obtener datos de la API');
             }
@@ -28,7 +30,7 @@ const ActividadComponente = () => {
 
     const eliminarActividad = async (id) => {
         try {
-            const response = await fetch(`https://censo-backend.onrender.com/actividad/${id}`, {
+            const response = await apiFetch(`${API_BASE_URL}/actividad/${id}/`, {
                 method: 'DELETE'
             });
             if (!response.ok) {
@@ -42,7 +44,7 @@ const ActividadComponente = () => {
 
     const actualizarActividad = async (id) => {
         try {
-            const response = await fetch(`https://censo-backend.onrender.com/actividad/${id}`, {
+            const response = await apiFetch(`${API_BASE_URL}/actividad/${id}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

@@ -2,8 +2,9 @@ import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
-import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -14,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
+import { API_BASE_URL } from 'src/config/api';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
@@ -30,48 +32,72 @@ export default function LoginView() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [challengeToken, setChallengeToken] = useState('');
+  const [code, setCode] = useState('');
 
-  const handleClick = async () => {
+  const handleClick = async (event) => {
+    event.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://censo-backend.onrender.com/api/token/', {
+      const response = await fetch(`${API_BASE_URL}${challengeToken ? '/api/token/verify/' : '/api/token/'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(challengeToken
+          ? { challenge_token: challengeToken, code: code.trim() }
+          : { email: email.trim().toLowerCase(), password }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
+      if (response.ok && data.requires_2fa) {
+        setChallengeToken(data.challenge_token);
+        setCode('');
+      } else if (response.ok) {
+        localStorage.setItem('token', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
         login();
         router.push('/');
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.detail || data.code || 'No se pudo iniciar sesión');
       }
-    } catch  {
-      setError(`Login error: ${  error.message}`);
+    } catch (requestError) {
+      setError(`Error de conexión: ${requestError.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const renderForm = (
+  const renderForm = challengeToken ? (
+    <>
+      <TextField
+        fullWidth
+        autoFocus
+        required
+        label="Código de autenticación o recuperación"
+        value={code}
+        onChange={(event) => setCode(event.target.value)}
+        inputProps={{ autoComplete: 'one-time-code' }}
+      />
+      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+      <LoadingButton fullWidth size="large" type="submit" variant="contained" color="inherit" loading={loading} sx={{ mt: 3 }}>Verificar</LoadingButton>
+      <Button onClick={() => { setChallengeToken(''); setCode(''); setError(null); }} sx={{ mt: 1 }}>Volver</Button>
+    </>
+  ) : (
     <>
       <Stack spacing={3}>
         <TextField
           name="email"
-          label="Email address"
+          label="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <TextField
           name="password"
-          label="Password"
+          label="Contraseña"
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -87,7 +113,7 @@ export default function LoginView() {
         />
       </Stack>
 
-      {error && <Typography color="error">{error}</Typography>}
+      {error && <Alert severity="error">{error}</Alert>}
 
       <LoadingButton
         fullWidth
@@ -96,9 +122,8 @@ export default function LoginView() {
         variant="contained"
         color="inherit"
         loading={loading}
-        onClick={handleClick}
       >
-        Login
+        Ingresar
       </LoadingButton>
     </>
   );
@@ -110,32 +135,24 @@ export default function LoginView() {
           color: alpha(theme.palette.background.default, 0.9),
           imgUrl: '/assets/background/overlay_4.jpg',
         }),
-        height: 1,
+        minHeight: '100vh',
+        px: 2,
       }}
     >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
-
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+      <Logo sx={{ position: 'fixed', top: { xs: 16, md: 24 }, left: { xs: 16, md: 24 } }} />
+      <Stack alignItems="center" justifyContent="center" sx={{ minHeight: '100vh' }}>
         <Card
+          component="form"
+          onSubmit={handleClick}
           sx={{
-            p: 5,
+            p: { xs: 3, sm: 5 },
             width: 1,
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Inicia sesión</Typography>
+          <Typography variant="h4">{challengeToken ? 'Verifica tu identidad' : 'Inicia sesión'}</Typography>
 
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
-            </Typography>
-          </Divider>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>Censo del resguardo</Typography>
 
           {renderForm}
         </Card>

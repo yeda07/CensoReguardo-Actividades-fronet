@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -9,10 +9,22 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
-import { account } from 'src/_mock/account'; // Asegúrate de importar tu objeto de cuenta desde el mock
+import { useRouter } from 'src/routes/hooks';
+
+import { apiJson } from 'src/config/api';
+import { account } from 'src/_mock/account';
+
+import { useAuth } from 'src/sections/context/AuthContext';
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    apiJson('/auth/me/').then(setProfile).catch(() => {});
+  }, []);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -23,16 +35,16 @@ export default function AccountPopover() {
   };
 
   const handleLogout = () => {
-    // Aquí deberías realizar la lógica de cierre de sesión
-    // Por ejemplo, limpiar el estado, eliminar el token JWT, etc.
-    console.log('Cerrando sesión...');
-    handleClose(); // Cerrar el popover después de hacer logout
+    logout();
+    handleClose();
+    router.push('/login');
   };
 
   return (
     <>
       <IconButton
         onClick={handleOpen}
+        aria-label="Cuenta"
         sx={{
           width: 40,
           height: 40,
@@ -45,14 +57,14 @@ export default function AccountPopover() {
       >
         <Avatar
           src={account.photoURL}
-          alt={account.displayName}
+          alt={profile?.first_name || profile?.username || 'Usuario'}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {(profile?.first_name || profile?.email || 'U').charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -73,26 +85,26 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {profile?.first_name || 'Usuario'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {profile?.email || 'Sesión activa'}
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {/* Aquí puedes agregar más elementos de menú si es necesario */}
-
-        <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
+        <MenuItem onClick={() => { handleClose(); router.push('/perfil'); }} sx={{ typography: 'body2', py: 1.5 }}>
+          Mi perfil
+        </MenuItem>
 
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleLogout} // Llama a la función de logout al hacer clic
+          onClick={handleLogout}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
-          Logout
+          Cerrar sesión
         </MenuItem>
       </Popover>
     </>

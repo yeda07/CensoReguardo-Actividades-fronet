@@ -22,6 +22,8 @@ import {
 
 import { useRouter } from 'src/routes/hooks';
 
+import { apiFetch, API_BASE_URL } from 'src/config/api';
+
 export default function CensoPage() {
     const [censoData, setCensoData] = useState([]);
     const [filteredCensoData, setFilteredCensoData] = useState([]);
@@ -57,7 +59,7 @@ export default function CensoPage() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        fetch('https://censo-backend.onrender.com/censo/', {
+        apiFetch(`${API_BASE_URL}/censo/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -161,7 +163,7 @@ export default function CensoPage() {
             }
         };
 
-        fetch('https://censo-backend.onrender.com/censo/', {
+        apiFetch(`${API_BASE_URL}/censo/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -180,11 +182,11 @@ export default function CensoPage() {
 
     const handleDeleteCensoAndPerson = (personaId, censoId) => {
         const token = localStorage.getItem('token');
-        const personaUrl = `https://censo-backend.onrender.com/persona/${personaId}/`;
-        const censoUrl = `https://censo-backend.onrender.com/censo/${censoId}/`;
+        const personaUrl = `${API_BASE_URL}/persona/${personaId}/`;
+        const censoUrl = `${API_BASE_URL}/censo/${censoId}/`;
 
         // First, delete the associated persona
-        fetch(personaUrl, {
+        apiFetch(personaUrl, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -195,7 +197,7 @@ export default function CensoPage() {
                     throw new Error('No se pudo eliminar la persona');
                 }
                 // Then, delete the censo
-                return fetch(censoUrl, {
+                return apiFetch(censoUrl, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -243,9 +245,9 @@ export default function CensoPage() {
     const handleUpdateCenso = (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
-        const censoUrl = `https://censo-backend.onrender.com/censo/${updateId}/`;
+        const censoUrl = `${API_BASE_URL}/censo/${updateId}/`;
         const personaId = censoData.find(censo => censo.id === updateId)?.persona.id;
-        const personaUrl = `https://censo-backend.onrender.com/persona/${personaId}/`;
+        const personaUrl = `${API_BASE_URL}/persona/${personaId}/`;
 
         const updatedCenso = {
             vigencia: formData.vigencia,
@@ -273,8 +275,8 @@ export default function CensoPage() {
            
         };
 
-        fetch(censoUrl, {
-            method: 'PUT',
+        apiFetch(censoUrl, {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -283,7 +285,7 @@ export default function CensoPage() {
         })
             .then(response => response.json())
             .then(updatedCensoData => {
-                fetch(personaUrl, {
+                apiFetch(personaUrl, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

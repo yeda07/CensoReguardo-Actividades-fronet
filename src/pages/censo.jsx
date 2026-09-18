@@ -8,7 +8,7 @@ export default function CensoPage() {
     return (
         <>
             <Helmet>
-                <title> CENSO </title>
+                <title>Censo | Censo del resguardo</title>
             </Helmet>
 
             <CensoView />

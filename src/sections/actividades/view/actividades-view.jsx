@@ -8,17 +8,24 @@ import {
   DialogTitle, FormControl, DialogActions, DialogContent, TableContainer
 } from '@mui/material';
 
+import { apiFetch, API_BASE_URL } from 'src/config/api';
+
+import Iconify from 'src/components/iconify';
+
+const ESTADOS = { P: 'Pendiente', E: 'Pendiente', N: 'No realizada', T: 'Realizada' };
+
 const Actividades = () => {
 
   const [open, setOpen] = useState(false);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [confirmarId, setConfirmarId] = useState(null);
   const [censoOptions, setCensoOptions] = useState([]);
   const [selectedCenso, setSelectedCenso] = useState('');
   const [actividadOptions, setActividadOptions] = useState([]);
   const [selectedActividad, setSelectedActividad] = useState('');
-  const [estado, setEstado] = useState('P');
-  const [monto, setMonto] = useState('');
-  const [fechaPago, setFechaPago] = useState('');
+  const [nuevaDescripcion, setNuevaDescripcion] = useState('');
+  const [nuevaFechaLimite, setNuevaFechaLimite] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [actividadesAsignadas, setActividadesAsignadas] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(7);
@@ -28,7 +35,7 @@ const Actividades = () => {
   useEffect(() => {
     const fetchCensos = async () => {
       try {
-        const response = await fetch('https://censo-backend.onrender.com/censo/');
+        const response = await apiFetch(`${API_BASE_URL}/censo/`);
         if (!response.ok) {
           throw new Error('Error al cargar los censos');
         }
@@ -46,7 +53,7 @@ const Actividades = () => {
 
     const fetchActividades = async () => {
       try {
-        const response = await fetch('https://censo-backend.onrender.com/actividad/');
+        const response = await apiFetch(`${API_BASE_URL}/actividad/`);
         if (!response.ok) {
           throw new Error('Error al cargar las actividades');
         }
@@ -63,19 +70,19 @@ const Actividades = () => {
 
     const fetchActividadesAsignadas = async () => {
       try {
-        const response = await fetch('https://censo-backend.onrender.com/censo_actividad/');
+        const response = await apiFetch(`${API_BASE_URL}/censo_actividad/`);
         if (!response.ok) {
           throw new Error('Error al cargar las actividades asignadas');
         }
         const data = await response.json();
         const actividadesMapped = await Promise.all(data.map(async (actividad) => {
-          const responseCenso = await fetch(`https://censo-backend.onrender.com/censo/${actividad.censo}/`);
+          const responseCenso = await apiFetch(`${API_BASE_URL}/censo/${actividad.censo}/`);
           if (!responseCenso.ok) {
             throw new Error('Error al cargar el censo asociado');
           }
           const censoData = await responseCenso.json();
 
-          const responseActividad = await fetch(`https://censo-backend.onrender.com/actividad/${actividad.actividad}/`);
+          const responseActividad = await apiFetch(`${API_BASE_URL}/actividad/${actividad.actividad}/`);
           if (!responseActividad.ok) {
             throw new Error('Error al cargar la actividad');
           }
@@ -90,7 +97,7 @@ const Actividades = () => {
             actividadDescripcion: actividadData.descripcion,
             fechaLimite: actividadData.fecha_limite,
             montoMulta: actividad.multas.length > 0 ? actividad.multas[0].monto : '',
-            fecha_pago: actividad.fecha_pago // Asegúrate de que fecha_pago esté disponible en tu API
+            fecha_realizacion: actividad.fecha_realizacion
           };
         }));
         setActividadesAsignadas(actividadesMapped);
@@ -112,9 +119,6 @@ const Actividades = () => {
     setOpen(false);
     setSelectedCenso('');
     setSelectedActividad('');
-    setEstado('P');
-    setMonto('');
-    setFechaPago('');
   };
 
   const handleCreateDialogOpen = () => {
@@ -123,21 +127,21 @@ const Actividades = () => {
 
   const handleCreateDialogClose = () => {
     setOpenCreateDialog(false);
+    setNuevaDescripcion('');
+    setNuevaFechaLimite('');
   };
 
   const handleAsignarActividad = async () => {
+    setErrorMessage('');
     try {
-      const response = await fetch('https://censo-backend.onrender.com/censo_actividad/', {
+      const response = await apiFetch(`${API_BASE_URL}/censo_actividad/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           censo: selectedCenso,
-          actividad: selectedActividad,
-          estado,
-          multa_monto: monto,
-          fecha_pago: fechaPago
+          actividad: selectedActividad
         })
       });
 
@@ -147,13 +151,13 @@ const Actividades = () => {
 
       const data = await response.json();
 
-      const responseCenso = await fetch(`https://censo-backend.onrender.com/censo/${selectedCenso}/`);
+      const responseCenso = await apiFetch(`${API_BASE_URL}/censo/${selectedCenso}/`);
       if (!responseCenso.ok) {
         throw new Error('Error al cargar el censo asociado');
       }
       const censoData = await responseCenso.json();
 
-      const responseActividad = await fetch(`https://censo-backend.onrender.com/actividad/${selectedActividad}/`);
+      const responseActividad = await apiFetch(`${API_BASE_URL}/actividad/${selectedActividad}/`);
       if (!responseActividad.ok) {
         throw new Error('Error al cargar la actividad');
       }
@@ -168,26 +172,27 @@ const Actividades = () => {
         actividadDescripcion: actividadData.descripcion,
         fechaLimite: actividadData.fecha_limite,
         montoMulta: data.multas.length > 0 ? data.multas[0].monto : '',
-        fecha_pago: data.fecha_pago
+        fecha_realizacion: data.fecha_realizacion
       };
 
       setActividadesAsignadas([...actividadesAsignadas, nuevaActividad]);
       handleClose(); // Cierra el diálogo después de asignar la actividad
     } catch (error) {
-      console.error('Error al enviar la actividad:', error);
+      setErrorMessage(error.message);
     }
   };
 
   const handleCrearActividad = async () => {
+    setErrorMessage('');
     try {
-      const response = await fetch('https://censo-backend.onrender.com/actividad/', {
+      const response = await apiFetch(`${API_BASE_URL}/actividad/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          descripcion: selectedActividad,
-          fecha_limite: fechaPago
+          descripcion: nuevaDescripcion,
+          fecha_limite: nuevaFechaLimite
         })
       });
 
@@ -195,9 +200,37 @@ const Actividades = () => {
         throw new Error('Error al crear la actividad');
       }
 
+      const creada = await response.json();
+      setActividadOptions(prev => [...prev, {
+        value: creada.id,
+        label: `${creada.descripcion} - Fecha límite: ${creada.fecha_limite}`
+      }]);
       handleCreateDialogClose();
     } catch (error) {
-      console.error('Error al crear la actividad:', error);
+      setErrorMessage(error.message);
+    }
+  };
+
+  const handleCompletarActividad = async (id) => {
+    setErrorMessage('');
+    try {
+      const response = await apiFetch(`${API_BASE_URL}/censo_actividad/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'T' })
+      });
+      if (!response.ok) throw new Error('No se pudo confirmar la actividad');
+      const actualizada = await response.json();
+      setActividadesAsignadas(prev => prev.map(item => item.id === id ? {
+        ...item,
+        estado: actualizada.estado,
+        multas: actualizada.multas,
+        montoMulta: '',
+        fecha_realizacion: actualizada.fecha_realizacion
+      } : item));
+      setConfirmarId(null);
+    } catch (requestError) {
+      setErrorMessage(requestError.message);
     }
   };
 
@@ -215,6 +248,7 @@ const Actividades = () => {
       <Typography variant="h4" gutterBottom>
         Actividades
       </Typography>
+      {errorMessage && <Typography color="error" role="alert">{errorMessage}</Typography>}
       <Button
         variant="contained"
         color="primary"
@@ -253,6 +287,7 @@ const Actividades = () => {
               <TableCell>Fecha Límite</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Multa/Monto</TableCell>
+              <TableCell>Acción</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -271,9 +306,20 @@ const Actividades = () => {
                   <TableCell>{`${actividad.personaNombre} ${actividad.personaApellido}`}</TableCell>
                   <TableCell>{actividad.actividadDescripcion}</TableCell>
                   <TableCell>{actividad.fechaLimite}</TableCell>
-                  <TableCell>{actividad.estado}</TableCell>
+                  <TableCell>{ESTADOS[actividad.estado] || actividad.estado}</TableCell>
                   <TableCell>
                     {actividad.montoMulta !== '' ? actividad.montoMulta : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    {actividad.estado !== 'T' && (
+                      <Button
+                        size="small"
+                        startIcon={<Iconify icon="eva:checkmark-circle-2-outline" />}
+                        onClick={() => setConfirmarId(actividad.id)}
+                      >
+                        Confirmar realizada
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -318,42 +364,12 @@ const Actividades = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Estado</InputLabel>
-            <Select
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-            >
-              <MenuItem value="P">Pendiente</MenuItem>
-              <MenuItem value="E">En proceso</MenuItem>
-              <MenuItem value="T">Completado</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            margin="dense"
-            label="Multa/Monto"
-            type="text"
-            fullWidth
-            value={monto}
-            onChange={(e) => setMonto(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Fecha de Pago"
-            type="date"
-            fullWidth
-            value={fechaPago}
-            onChange={(e) => setFechaPago(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleAsignarActividad} color="primary">
+          <Button onClick={handleAsignarActividad} color="primary" disabled={!selectedCenso || !selectedActividad}>
             Asignar
           </Button>
         </DialogActions>
@@ -366,16 +382,16 @@ const Actividades = () => {
             label="Descripción"
             type="text"
             fullWidth
-            value={selectedActividad}
-            onChange={(e) => setSelectedActividad(e.target.value)}
+            value={nuevaDescripcion}
+            onChange={(e) => setNuevaDescripcion(e.target.value)}
           />
           <TextField
             margin="dense"
             label="Fecha Límite"
             type="date"
             fullWidth
-            value={fechaPago}
-            onChange={(e) => setFechaPago(e.target.value)}
+            value={nuevaFechaLimite}
+            onChange={(e) => setNuevaFechaLimite(e.target.value)}
             InputLabelProps={{
               shrink: true,
             }}
@@ -385,9 +401,19 @@ const Actividades = () => {
           <Button onClick={handleCreateDialogClose} color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleCrearActividad} color="primary">
+          <Button onClick={handleCrearActividad} color="primary" disabled={!nuevaDescripcion.trim() || !nuevaFechaLimite}>
             Crear
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={confirmarId !== null} onClose={() => setConfirmarId(null)}>
+        <DialogTitle>Confirmar actividad realizada</DialogTitle>
+        <DialogContent>
+          <Typography>Esta acción marcará la actividad como realizada y eliminará su multa, si existe.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmarId(null)}>Cancelar</Button>
+          <Button onClick={() => handleCompletarActividad(confirmarId)}>Confirmar</Button>
         </DialogActions>
       </Dialog>
     </Container>

@@ -1,2 +1,2 @@
-export { default as CensoView } from './censo-view';
+export { default as CensoView } from './censo-workspace';
 

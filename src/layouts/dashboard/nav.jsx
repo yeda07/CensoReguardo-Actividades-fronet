@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -14,6 +14,7 @@ import { RouterLink } from 'src/routes/components';
 
 import { useResponsive } from 'src/hooks/use-responsive';
 
+import { apiJson } from 'src/config/api';
 import { account } from 'src/_mock/account';
 
 import Logo from 'src/components/logo';
@@ -26,6 +27,7 @@ import navConfig from './config-navigation';
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
+  const [profile, setProfile] = useState(null);
 
   const upLg = useResponsive('up', 'lg');
 
@@ -36,6 +38,11 @@ export default function Nav({ openNav, onCloseNav }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  useEffect(() => {
+    apiJson('/auth/me/').then(setProfile).catch(() => {});
+  }, []);
+
+  const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || profile?.username || 'Usuario';
   const renderAccount = (
     <Box
       sx={{
@@ -49,14 +56,10 @@ export default function Nav({ openNav, onCloseNav }) {
         bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
       }}
     >
-      <Avatar src={account.photoURL} alt="photoURL" />
-
-      <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{account.displayName}</Typography>
-
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.role}
-        </Typography>
+      <Avatar src={account.photoURL} alt={displayName}>{displayName.charAt(0).toUpperCase()}</Avatar>
+      <Box sx={{ ml: 2, minWidth: 0 }}>
+        <Typography variant="subtitle2" noWrap>{displayName}</Typography>
+        <Typography variant="body2" color="text.secondary" noWrap>{profile?.email || 'Sesión activa'}</Typography>
       </Box>
     </Box>
   );
@@ -139,7 +142,7 @@ Nav.propTypes = {
 function NavItem({ item }) {
   const pathname = usePathname();
 
-  const active = item.path === pathname;
+  const active = item.path === '/' ? pathname === '/' : pathname.startsWith(item.path);
 
   return (
     <ListItemButton
@@ -150,7 +153,6 @@ function NavItem({ item }) {
         borderRadius: 0.75,
         typography: 'body2',
         color: 'text.secondary',
-        textTransform: 'capitalize',
         fontWeight: 'fontWeightMedium',
         ...(active && {
           color: 'primary.main',

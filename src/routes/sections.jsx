@@ -10,9 +10,12 @@ import { useAuth, AuthProvider } from 'src/sections/context/AuthContext';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const LoginPage = lazy(() => import('src/pages/login'));
-export const ListaPage = lazy(() => import('src/pages/lista'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const PdfPage = lazy(() => import('src/pages/pdf'));
+export const FamiliasPage = lazy(() => import('src/pages/familias'));
+export const PersonasPage = lazy(() => import('src/pages/personas'));
+export const FamiliaDetallePage = lazy(() => import('src/pages/familia-detalle'));
+export const ProfilePage = lazy(() => import('src/pages/profile'));
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -43,8 +46,12 @@ function AppRoutes() {
       children: [
         { element: <IndexPage />, index: true },
         { path: 'censo', element: <CensoPage /> },
+        { path: 'familias', element: <FamiliasPage /> },
+        { path: 'personas', element: <PersonasPage /> },
+        { path: 'familias/:id', element: <FamiliaDetallePage /> },
+        { path: 'perfil', element: <ProfilePage /> },
         { path: 'actividades', element: <ActividadesPage /> },
-        { path: 'lista', element: <ListaPage /> },
+        { path: 'lista', element: <Navigate to="/actividades?tab=catalogo" replace /> },
         { path: 'pdf/:id', element: <PdfPage /> }
       ],
     },
